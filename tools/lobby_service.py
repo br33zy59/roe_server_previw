@@ -107,7 +107,8 @@ class LobbyState:
                 return self.rooms[int(map_id)]
             return self.default_room
 
-    def _join_value(self, room):
+    def _join_value(self, room, client_map_id=None):
+        map_id = int(client_map_id) if client_map_id is not None else int(room['map_id'])
         return {
             'delay_after_found': int(self.config.get('match', {}).get('join_delay', 1)),
             'notification': {
@@ -117,7 +118,7 @@ class LobbyState:
                 'unknown_14': 0,
                 'unknown_18': 0,
                 'unknown_20': 1,
-                'unknown_28': int(room['map_id']),
+                'unknown_28': map_id,
                 'unknown_2c': 0,
             },
             'response': {
@@ -145,7 +146,7 @@ class LobbyState:
         room = self.room_for_map(map_id)
         if room is None:
             return None
-        value = self._join_value(room)
+        value = self._join_value(room, client_map_id=map_id)
         temporary = self.join_path.with_suffix('.tmp')
         temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
         temporary.replace(self.join_path)

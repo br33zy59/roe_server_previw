@@ -309,7 +309,9 @@ async def serve(args, ready=None, stop=None):
             capture.record('match_found', code='0x6e2d', forced=bool(force), **info)
             status()
             join = current_join(team['requested'][4] if team['requested'] else None)
-            if join is not None and (team['training'] or force) and not join_state['sent']:
+            # Локальный preview: после Match Found всегда отдаём адрес единственной
+            # комнаты (Solo/Squad, TPP/FPP, Training/Battle — только UI клиента).
+            if join is not None and not join_state['sent']:
                 await asyncio.sleep(join[3])
                 if team['generation'] != generation or writer.is_closing() or not enabled['server_to_client']:
                     return
